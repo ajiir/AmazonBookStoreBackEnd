@@ -10,7 +10,17 @@ const errorHandler = (err, req, res, next) => {
   //   error.statusCode = 400;
   // }
 
+  console.log(error.message);
+
   // jwt malformed
+  if (
+    error.message.startsWith(
+      "User validation failed: password: Path `password` "
+    )
+  ) {
+    error.message = "Нууц үг доод тал нь 4 тэмдэгтээс тогтох ёстой!";
+    error.statusCode = 401;
+  }
 
   if (error.message === "jwt malformed") {
     error.message = "Та логин хийж байж энэ үйлдлийг хийх боломжтой...";
@@ -27,7 +37,7 @@ const errorHandler = (err, req, res, next) => {
     error.statusCode = 400;
   }
 
-  res.status(err.statusCode || 500).json({
+  res.status(error.statusCode || 500).json({
     success: false,
     error,
   });

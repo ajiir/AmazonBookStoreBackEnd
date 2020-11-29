@@ -7,6 +7,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
   // console.log(req.headers);
   let token = null;
 
+  console.log("++++++++++" + req.headers);
   if (req.headers.authorization) {
     token = req.headers.authorization.split(" ")[1];
   } else if (req.cookies) {

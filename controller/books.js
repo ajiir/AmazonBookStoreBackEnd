@@ -45,14 +45,23 @@ exports.getCategoryBooks = asyncHandler(async (req, res, next) => {
   const limit = parseInt(req.query.limit) || 2;
   const sort = req.query.sort;
   const select = req.query.select;
+  let search = req.query.search;
 
-  ["select", "sort", "page", "limit"].forEach((el) => delete req.query[el]);
+  ["select", "sort", "page", "limit", "search"].forEach(
+    (el) => delete req.query[el]
+  );
 
   const pagination = await paginate(page, limit, Book);
 
   //req.query, select
+  if (!search) search = "";
+
   const books = await Book.find(
-    { ...req.query, category: req.params.categoryId },
+    {
+      ...req.query,
+      category: req.params.categoryId,
+      name: { $regex: search, $options: "i" },
+    },
     select
   )
     .sort(sort)
@@ -173,7 +182,7 @@ exports.uploadBookPhoto = asyncHandler(async (req, res, next) => {
     throw new MyError("Таны зурагны хэмжээ хэтэрсэн байна.", 400);
   }
 
-  file.name = `photo_${req.params.id}${path.parse(file.name).ext}`;
+  // file.name = `photo_${req.params.id}${path.parse(file.name).ext}`;
 
   file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, (err) => {
     if (err) {
